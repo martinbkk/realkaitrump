@@ -5,6 +5,7 @@
 [build.environment]
   NODE_VERSION = "18.18.0"
   NPM_VERSION = "9.8.1"
+  NODE_ENV = "production"
 
 [[redirects]]
   from = "/*"
@@ -44,17 +45,17 @@
 
 # Production context
 [context.production]
-  command = "npm install && npm run build"
+  command = "npm install typescript -D && npm install && npm run build"
   environment = { NODE_ENV = "production" }
 
 # Deploy preview context
 [context.deploy-preview]
-  command = "npm install && npm run build"
+  command = "npm install typescript -D && npm install && npm run build"
   environment = { NODE_ENV = "production" }
 
 # Branch deploy context
 [context.branch-deploy]
-  command = "npm install && npm run build"
+  command = "npm install typescript -D && npm install && npm run build"
   environment = { NODE_ENV = "production" }
 
 # Development server settings
