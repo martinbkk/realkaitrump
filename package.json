@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npx typescript --build && vite build",
+    "build": "./node_modules/.bin/tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
