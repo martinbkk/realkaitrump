@@ -43,7 +43,7 @@ function App() {
             youtubeRef.current.src = `https://www.youtube.com/embed/f3IRyyzg7Zo?enablejsapi=1&autoplay=1&mute=0&loop=0&playsinline=1`;
             setIsYoutubeMuted(false);
           } else if (!entry.isIntersecting && youtubeRef.current) {
-            // Store current time before reloading with autoplay=0
+            // Pause video when out of view by removing autoplay
             const currentSrc = youtubeRef.current.src;
             youtubeRef.current.src = currentSrc.replace('autoplay=1', 'autoplay=0');
           }
@@ -82,17 +82,17 @@ function App() {
     const initVideo = async () => {
       if (heroVideoRef.current) {
         try {
-          // First try to play unmuted
+          // Start unmuted
           heroVideoRef.current.muted = false;
-          await heroVideoRef.current.play();
           setIsHeroMuted(false);
+          await heroVideoRef.current.play();
         } catch (error) {
           console.error('Unmuted autoplay failed:', error);
           try {
-            // If unmuted fails, try muted
+            // Fallback to muted if unmuted fails
             heroVideoRef.current.muted = true;
-            await heroVideoRef.current.play();
             setIsHeroMuted(true);
+            await heroVideoRef.current.play();
           } catch (error) {
             console.error('Muted autoplay failed:', error);
           }
@@ -115,16 +115,13 @@ function App() {
     };
   }, []);
 
-  // Update video loop handler to maintain unmuted state
+  // Update video loop handler to always loop muted
   const handleVideoLoop = () => {
     if (heroVideoRef.current) {
-      const wasMuted = heroVideoRef.current.muted;
-      heroVideoRef.current.play().then(() => {
-        heroVideoRef.current!.muted = wasMuted;
-        setIsHeroMuted(wasMuted);
-      }).catch(() => {
-        heroVideoRef.current!.muted = true;
-        setIsHeroMuted(true);
+      heroVideoRef.current.muted = true;
+      setIsHeroMuted(true);
+      heroVideoRef.current.play().catch(error => {
+        console.error('Loop playback failed:', error);
       });
     }
   };
@@ -137,6 +134,7 @@ function App() {
           if (entry.isIntersecting && secondYoutubeRef.current) {
             secondYoutubeRef.current.src = `https://www.youtube.com/embed/UhFXpviOytY?enablejsapi=1&autoplay=1&mute=0&loop=0&playsinline=1`;
           } else if (!entry.isIntersecting && secondYoutubeRef.current) {
+            // Pause video when out of view
             const currentSrc = secondYoutubeRef.current.src;
             secondYoutubeRef.current.src = currentSrc.replace('autoplay=1', 'autoplay=0');
           }
@@ -160,6 +158,7 @@ function App() {
           if (entry.isIntersecting && qaYoutubeRef.current) {
             qaYoutubeRef.current.src = `https://www.youtube.com/embed/D8my9sMTGtA?enablejsapi=1&autoplay=1&mute=0&loop=0&playsinline=1`;
           } else if (!entry.isIntersecting && qaYoutubeRef.current) {
+            // Pause video when out of view
             const currentSrc = qaYoutubeRef.current.src;
             qaYoutubeRef.current.src = currentSrc.replace('autoplay=1', 'autoplay=0');
           }
