@@ -1,5 +1,6 @@
 "use client";
 import { TextGenerateEffect } from "./text-generate-effect";
+import { useMediaQuery } from "react-responsive";
 
 const words = `OMG, hey guys! It's Kai Trump here—yeah, that Kai Trump, granddaughter of the Donald Trump. So, like, here's the tea: I just created a meme website about myself, and honestly, it's the most genius thing I've ever done. Let me tell you all about it. 👑✨
 
@@ -21,5 +22,6 @@ Anyway, go check out my site (link's in my bio, obvi). Share your favorite memes
 Alright, that's all for now. Love you all—except the haters, lol. Byeee! 😘`;
 
 export function TextGenerateEffectDemo() {
-  return <TextGenerateEffect duration={1.4} filter={false} words={words} />;
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  return <TextGenerateEffect duration={isMobile ? 0.7 : 1.4} filter={false} words={words} />;
 } 

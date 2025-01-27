@@ -82,23 +82,19 @@ function App() {
     const initVideo = async () => {
       if (heroVideoRef.current) {
         try {
-          // Start unmuted for first play
+          // First try to play unmuted
           heroVideoRef.current.muted = false;
-          setIsHeroMuted(false);
-          
-          // Need to set muted first to autoplay in most browsers
-          heroVideoRef.current.muted = true;
           await heroVideoRef.current.play();
-          // Then unmute after playback starts
-          heroVideoRef.current.muted = false;
           setIsHeroMuted(false);
         } catch (error) {
-          console.error('Video autoplay failed:', error);
-          // Fallback: try to play muted if unmuted autoplay fails
-          if (heroVideoRef.current) {
+          console.error('Unmuted autoplay failed:', error);
+          try {
+            // If unmuted fails, try muted
             heroVideoRef.current.muted = true;
+            await heroVideoRef.current.play();
             setIsHeroMuted(true);
-            heroVideoRef.current.play();
+          } catch (error) {
+            console.error('Muted autoplay failed:', error);
           }
         }
       }
@@ -119,12 +115,17 @@ function App() {
     };
   }, []);
 
-  // Update video loop handler
+  // Update video loop handler to maintain unmuted state
   const handleVideoLoop = () => {
     if (heroVideoRef.current) {
-      heroVideoRef.current.muted = true; // Mute on subsequent loops
-      setIsHeroMuted(true);
-      heroVideoRef.current.play();
+      const wasMuted = heroVideoRef.current.muted;
+      heroVideoRef.current.play().then(() => {
+        heroVideoRef.current!.muted = wasMuted;
+        setIsHeroMuted(wasMuted);
+      }).catch(() => {
+        heroVideoRef.current!.muted = true;
+        setIsHeroMuted(true);
+      });
     }
   };
 
