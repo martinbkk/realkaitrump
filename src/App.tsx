@@ -82,44 +82,58 @@ function App() {
     const initVideo = async () => {
       if (heroVideoRef.current) {
         try {
-          // Start unmuted
+          // Set initial state
           heroVideoRef.current.muted = false;
           setIsHeroMuted(false);
-          await heroVideoRef.current.play();
-        } catch (error) {
-          console.error('Unmuted autoplay failed:', error);
-          try {
-            // Fallback to muted if unmuted fails
-            heroVideoRef.current.muted = true;
-            setIsHeroMuted(true);
-            await heroVideoRef.current.play();
-          } catch (error) {
-            console.error('Muted autoplay failed:', error);
+          // Force reload the video to ensure fresh start
+          heroVideoRef.current.currentTime = 0;
+          // Attempt to play unmuted
+          const playPromise = heroVideoRef.current.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.error('Unmuted autoplay failed:', error);
+              // If unmuted fails, try muted
+              if (heroVideoRef.current) {
+                heroVideoRef.current.muted = true;
+                setIsHeroMuted(true);
+                heroVideoRef.current.play().catch(error => {
+                  console.error('Muted autoplay failed:', error);
+                });
+              }
+            });
           }
+        } catch (error) {
+          console.error('Video initialization failed:', error);
         }
       }
     };
 
+    // Initialize video when component mounts
     initVideo();
     
-    // Add ended event listener
-    if (heroVideoRef.current) {
-      heroVideoRef.current.addEventListener('ended', handleVideoLoop);
+    // Add ended event listener for looping
+    const videoElement = heroVideoRef.current;
+    if (videoElement) {
+      videoElement.addEventListener('ended', handleVideoLoop);
     }
 
     // Cleanup
     return () => {
-      if (heroVideoRef.current) {
-        heroVideoRef.current.removeEventListener('ended', handleVideoLoop);
+      if (videoElement) {
+        videoElement.removeEventListener('ended', handleVideoLoop);
       }
     };
   }, []);
 
-  // Update video loop handler to always loop muted
+  // Video loop handler - always muted on loop
   const handleVideoLoop = () => {
     if (heroVideoRef.current) {
+      // Ensure video is muted for loop
       heroVideoRef.current.muted = true;
       setIsHeroMuted(true);
+      // Reset to start
+      heroVideoRef.current.currentTime = 0;
+      // Play muted
       heroVideoRef.current.play().catch(error => {
         console.error('Loop playback failed:', error);
       });
