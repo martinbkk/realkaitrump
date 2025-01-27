@@ -77,33 +77,30 @@ function App() {
     }
   };
 
-  // Add video load handler
+  // Add video load handler with improved initialization
   useEffect(() => {
     const initVideo = async () => {
       if (heroVideoRef.current) {
+        // Reset video state
+        heroVideoRef.current.currentTime = 0;
+        heroVideoRef.current.muted = false;
+        setIsHeroMuted(false);
+
         try {
-          // Set initial state
-          heroVideoRef.current.muted = false;
-          setIsHeroMuted(false);
-          // Force reload the video to ensure fresh start
-          heroVideoRef.current.currentTime = 0;
-          // Attempt to play unmuted
-          const playPromise = heroVideoRef.current.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.error('Unmuted autoplay failed:', error);
-              // If unmuted fails, try muted
-              if (heroVideoRef.current) {
-                heroVideoRef.current.muted = true;
-                setIsHeroMuted(true);
-                heroVideoRef.current.play().catch(error => {
-                  console.error('Muted autoplay failed:', error);
-                });
-              }
-            });
-          }
+          // Try to play unmuted first
+          await heroVideoRef.current.play();
         } catch (error) {
-          console.error('Video initialization failed:', error);
+          console.error('Unmuted autoplay failed:', error);
+          // If unmuted fails, try muted
+          if (heroVideoRef.current) {
+            heroVideoRef.current.muted = true;
+            setIsHeroMuted(true);
+            try {
+              await heroVideoRef.current.play();
+            } catch (secondError) {
+              console.error('Muted autoplay also failed:', secondError);
+            }
+          }
         }
       }
     };
@@ -332,7 +329,6 @@ function App() {
               autoPlay 
               playsInline 
               preload="auto"
-              muted
               onEnded={handleVideoLoop}
             >
               <source 
