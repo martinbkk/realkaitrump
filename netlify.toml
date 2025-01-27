@@ -5,6 +5,7 @@
 [build.environment]
   NODE_VERSION = "18.18.0"
   NPM_VERSION = "9.8.1"
+  CI = "true"
 
 [[redirects]]
   from = "/*"
@@ -39,17 +40,17 @@
 # Production context
 [context.production]
   command = "NODE_ENV=development npm install && npm run build"
-  environment = { NODE_ENV = "production" }
+  environment = { NODE_ENV = "production", CI = "true" }
 
 # Deploy preview context
 [context.deploy-preview]
   command = "NODE_ENV=development npm install && npm run build"
-  environment = { NODE_ENV = "production" }
+  environment = { NODE_ENV = "production", CI = "true" }
 
 # Branch deploy context
 [context.branch-deploy]
   command = "NODE_ENV=development npm install && npm run build"
-  environment = { NODE_ENV = "production" }
+  environment = { NODE_ENV = "production", CI = "true" }
 
 # Development server settings
 [dev]
