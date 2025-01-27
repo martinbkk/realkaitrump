@@ -1,5 +1,5 @@
 [build]
-  command = "npm install typescript -D && npm install && npm run build"
+  command = "npm install typescript@5.5.3 -D && npm install && npm run build"
   publish = "dist"
 
 [build.environment]
@@ -45,17 +45,17 @@
 
 # Production context
 [context.production]
-  command = "npm install typescript -D && npm install && npm run build"
+  command = "npm install typescript@5.5.3 -D && npm install && npm run build"
   environment = { NODE_ENV = "production" }
 
 # Deploy preview context
 [context.deploy-preview]
-  command = "npm install typescript -D && npm install && npm run build"
+  command = "npm install typescript@5.5.3 -D && npm install && npm run build"
   environment = { NODE_ENV = "production" }
 
 # Branch deploy context
 [context.branch-deploy]
-  command = "npm install typescript -D && npm install && npm run build"
+  command = "npm install typescript@5.5.3 -D && npm install && npm run build"
   environment = { NODE_ENV = "production" }
 
 # Development server settings
